@@ -12,6 +12,7 @@ After looking at different recommendations and going through several structures,
 
 First of all, I want to show you my structure than I will describe why I created this and how your files should look like.
 
+```
 ├── build
 ├── public
 ├── src
@@ -53,6 +54,8 @@ First of all, I want to show you my structure than I will describe why I created
 │       ├── routes.js
 │       ├── index.js
 │       ├── utils.js
+```
+
 So, this is the file structure I have been using and it’s pretty clear and allows me to write reusable components in a pretty awesome manner.
 
 The main folder here is the src it’s the folder where you put all of your components and configurations.
