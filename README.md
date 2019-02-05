@@ -242,3 +242,5 @@ This file contains all the functions which are shared across different features,
 ## Conclusion
 
 This is the file structure I have been using for developing different React applications and it’s very helpful for me and it allows me to code in a cleaner way. _Again this is just my opinion, I am not saying that this the best way and there isn’t any other way of doing it_. It’s just my opinion and I developed this structure after reviewing different structures people are using for React. I spent a lot of time creating this structure and it helped me a lot in so many projects.
+
+[//]: <> ( TODO: Add structure for tests and ImmutabaleJS)
