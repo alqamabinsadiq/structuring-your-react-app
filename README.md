@@ -1,13 +1,11 @@
-# Structuring Your React App
+# structuring-your-react-app
 
 I have been working on React for more than two years and whenever I start developing a React application the very first thing comes in my mind is “how to structure this application”. And there are a lot of opinions by different developers around the world. If you look at the official documentation or if you ask anyone from a React core team or look at the official documentation for this question:
 “Is there a recommended way to structure React projects?”
 
 This is what you will get in return.
 
-```
-React doesn’t have opinions on how you put files into folders. That said there are a few common approaches popular in the ecosystem you may want to consider.
-```
+> React doesn’t have opinions on how you put files into folders. That said there are a few common approaches popular in the ecosystem you may want to consider.
 
 I myself, whenever I was about to start working on a new application from scratch I was very confused about, what structure to follow. And it takes a lot of time to think because for me it’s very important to organize my project because in future if someone else is going to join my team it will be easier for them to understand the code.
 
@@ -71,7 +69,32 @@ This is the folder where you put all of your **configurations**. Like if you are
 
 _Actions are pure JavaScript objects_ but I see a lot of people are using them differently, instead of the recommended way. Your actions should only contain a type and a payload(data). What I do is I create a different file for different features inside the action folder. So you can create files like `user.action.js` for actions related to the user and so on. And your action file should only contain the actions and their types only. Like you can see in the Gist below.
 
-<script src="https://gist.github.com/alqamabinsadiq/24acca6b9264c52d1e70205cefc269e5.js"></script>
+```
+// action types.
+export const actions = {
+  SET_USER_INFO: "SET_USER_INFO",
+  SET_ALL_USERS: "SET_ALL_USERS",
+  SET_CURRENT_USER: "SET_CURRENT_USER",
+};
+
+// set's the user to redux.
+export const setUser = (data) => ({
+  type: actions.SET_USER_INFO,
+  data
+});
+
+// set's all the users to redux.
+export const setAllUsers = (data) => ({
+  type: actions.SET_ALL_USERS,
+  data
+});
+
+// Set's current user in redux.
+export const setCurrentUser = (data) => ({
+  type: actions.SET_CURRENT_USER,
+  data
+});
+```
 
 ### assets
 
@@ -90,13 +113,71 @@ Containers are those components who have direct access to the state of the appli
 
 This directory contains all of my network requests. I usually create one file named `verbs.services.js` where I create requests like `getRequest` which takes the URL and returns a promise. In this way, you don’t have to set headers again and again and it also reduces the number of lines you have to code. Other files are depending on your features. Like for company you can create a service file named `company.services.js` which will contain all the services for company feature, as you can see in the following Gist.
 
-<script src="https://gist.github.com/alqamabinsadiq/07582187449c80cb372cb2eb466f8b20.js"></script>
+```
+
+import { openNotificationWithIcon } from 'utils/notification';
+import api from 'utils/api';
+import { setAllCompanies } from '../actions/company.action';
+
+export const getAllCompanies = (resolve, reject) => {
+  return (dispatch) => {
+    getRequest(`${api.url}company`)
+      .then(({ data }) => {
+        dispatch(setAllCompanies(data));
+        resolve();
+      }).catch((error) => {
+        openNotificationWithIcon('error', 'Error!', error);
+        reject();
+      });
+  };
+};
+
+export const createCompany = (data, dataSource, resolve, reject) => {
+  return (dispatch) => {
+    postRequest(`${api.url}company/`,data)
+      .then(({ data }) => {
+        const company = data;
+        const newSource = [...dataSource];
+        newSource.push(company);
+
+        dispatch(setAllCompanies(newSource));
+        openNotificationWithIcon('success', 'Success!', `Company created successfully.`);
+
+        resolve();
+
+      }).catch((error) => {
+        openNotificationWithIcon('error', 'Error!', error);
+        reject();
+      });
+  };
+};
+```
 
 ### reducers
 
 This directory should contain all of your reducers. According to the official docs of redux. “_The **reducer** is a pure function that takes the previous state and action, and returns the next state.”_ but I see a lot of people they perform a lot of calculations inside this function and write a lot of code instead of just taking the action and returning the new state. They perform a lot of calculations which I don’t like. What I do is I perform all the calculations inside the services and make the reducers as clean as possible. You can create reducers according to the features like `company.reducer.js` . This directory also contains an `index.js` file where you basically combine all the reducers. Following Gists will illustrate more about this.
 
-<script src="https://gist.github.com/alqamabinsadiq/3cbda69b6446ba7eabe861a566e7e44e.js"></script>
+```
+import { actions } from 'actions/company.action';
+
+// Initial State
+const INITIAL_STATE = {
+  allCompanies: null,
+  currentCompany: null
+};
+
+// Company Reducer.
+export default (state = INITIAL_STATE, { type, data }) => {
+  switch (type) {
+    case actions.SET_ALL_COMPANIES:
+      return { ...state, allCompanies: data };
+    case actions.SET_CURRENT_COMPANY:
+      return { ...state, currentCompany: data };
+    default:
+      return state;
+  }
+}
+```
 
 ### store
 
@@ -113,7 +194,46 @@ This directory contains your flow types. You can create files like `base.types.j
 
 This file contains all the routes of your application. As you can see in the following Gist.
 
-<script src="https://gist.github.com/alqamabinsadiq/d86c389db61f5369a58e365148ee0d44.js"></script>
+```
+import Dashboard from './Dashboard/Dashboard.index';
+import Users from './Users/Users.index';
+import Company from './Company/Company.index';
+import Profile from './Profile/Profile.index';
+
+// router configuration.
+let routes = [
+  {
+    path: '/dashboard',
+    name: 'Project Dashboard',
+    component: Dashboard,
+    exact: true,
+    strict: true
+  },
+  {
+    path: '/dashboard/users',
+    name: 'Users',
+    component: Users,
+    exact: true,
+    strict: true
+  },
+  {
+    path: '/dashboard/company',
+    name: 'Company',
+    component: Company,
+    exact: true,
+    strict: true
+  },
+  {
+    path: '/dashboard/profile',
+    name: 'Profile',
+    component: Profile,
+    exact: true,
+    strict: true
+  }
+];
+
+export default routes;
+```
 
 ### utils.js
 
